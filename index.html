@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A TOCA | Sistema de Gerenciamento</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f8f5fc;
+            color: #333;
+        }
+
+        header {
+            background-color: #5B2182;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: #fff;
+        }
+
+        .logo {
+            max-width: 120px;
+        }
+
+        .menu {
+            background-color: #9333EA;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 10px;
+            flex-wrap: wrap;
+        }
+
+        .menu button {
+            background-color: #fff;
+            color: #5B2182;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .menu button:hover {
+            background-color: #e0d4f0;
+        }
+
+        .container {
+            padding: 15px;
+        }
+
+        .secao {
+            display: none;
+        }
+
+        .secao.ativa {
+            display: block;
+        }
+
+        .titulo-secao {
+            color: #5B2182;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #9333EA;
+            padding-bottom: 5px;
+        }
+
+        /* Estilo dos Pedidos */
+        .pedidos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+
+        .card-pedido {
+            background-color: #fff;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-left: 5px solid;
+        }
+
+        .ifood { border-color: #EA1D2C; }
+        .noventaenove { border-color: #FFBE00; }
+        .keeta { border-color: #165DFF; }
+
+        .card-pedido h3 {
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .acoes {
+            margin-top: 10px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #fff;
+        }
+
+        .btn-aceitar { background-color: #22c55e; }
+        .btn-preparar { background-color: #f59e0b; }
+        .btn-pronto { background-color: #3b82f6; }
+
+        /* Estilo Cardápio */
+        .cardapio-container {
+            background-color: #fff;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .item-cardapio {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .item-cardapio:last-child {
+            border: none;
+        }
+
+        .input-preco {
+            width: 80px;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            text-align: right;
+        }
+
+        .btn-salvar {
+            background-color: #5B2182;
+            color: #fff;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        iframe {
+            width: 100%;
+            height: 600px;
+            border: none;
+            border-radius: 12px;
+        }
+
+        footer {
+            background-color: #5B2182;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+            margin-top: 20px;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div>
+            <img src="logo.png" alt="Logo A TOCA" class="logo">
+            <h1>Sistema Integrado</h1>
+        </div>
+        <div>
+            <p>📍 Viela das Rosas, 188 - Paraisópolis</p>
+        </div>
+    </header>
+
+    <div class="menu">
+        <button onclick="abrirSecao('pedidos')">📥 Pedidos dos Apps</button>
+        <button onclick="abrirSecao('cardapio')">📋 Meu Cardápio</button>
+        <button onclick="abrirSecao('integracao')">🔌 Conexões</button>
+        <button onclick="abrirSecao('relatorios')">📊 Relatórios</button>
+    </div>
+
+    <div class="container">
+
+        <!-- SEÇÃO 1: PEDIDOS -->
+        <div id="pedidos" class="secao ativa">
+            <h2 class="titulo-secao">📥 Todos os Pedidos (iFood | 99Food | Keeta)</h2>
+            <div class="pedidos-grid">
+
+                <!-- EXEMPLO DE PEDIDO IFOOD -->
+                <div class="card-pedido ifood">
+                    <h3>iFood <span>#1234</span></h3>
+                    <p><strong>Cliente:</strong> Maria Silva</p>
+                    <p><strong>Item:</strong> Combo Suco Melancia + Tapioca Ovo</p>
+                    <p><strong>Valor:</strong> R$ 15,99</p>
+                    <div class="acoes">
+                        <button class="btn btn-aceitar" onclick="atualizarStatus(this, 'Aceito')">Aceitar</button>
+                        <button class="btn btn-preparar" onclick="atualizarStatus(this, 'Preparando')">Preparar</button>
+                        <button class="btn btn-pronto" onclick="atualizarStatus(this, 'Pronto')">Pronto</button>
+                    </div>
+                </div>
+
+                <!-- EXEMPLO DE PEDIDO 99FOOD -->
+                <div class="card-pedido noventaenove">
+                    <h3>99Food <span>#5678</span></h3>
+                    <p><strong>Cliente:</strong> João Santos</p>
+                    <p><strong>Item:</strong> Açaí 500ml + Churros Doce de Leite</p>
+                    <p><strong>Valor:</strong> R$ 25,80</p>
+                    <div class="acoes">
+                        <button class="btn btn-aceitar" onclick="atualizarStatus(this, 'Aceito')">Aceitar</button>
+                        <button class="btn btn-preparar" onclick="atualizarStatus(this, 'Preparando')">Preparar</button>
+                        <button class="btn btn-pronto" onclick="atualizarStatus(this, 'Pronto')">Pronto</button>
+                    </div>
+                </div>
+
+                <!-- EXEMPLO DE PEDIDO KEETA -->
+                <div class="card-pedido keeta">
+                    <h3>Keeta <span>#9012</span></h3>
+                    <p><strong>Cliente:</strong> Ana Carolina</p>
+                    <p><strong>Item:</strong> Caldo Verde + Tapioca Queijo</p>
+                    <p><strong>Valor:</strong> R$ 19,90</p>
+                    <div class="acoes">
+                        <button class="btn btn-aceitar" onclick="atualizarStatus(this, 'Aceito')">Aceitar</button>
+                        <button class="btn btn-preparar" onclick="atualizarStatus(this, 'Preparando')">Preparar</button>
+                        <button class="btn btn-pronto" onclick="atualizarStatus(this, 'Pronto')">Pronto</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- SEÇÃO 2: SEU CARDÁPIO INTEGRADO -->
+        <div id="cardapio" class="secao">
+            <h2 class="titulo-secao">📋 Gerenciar Cardápio Digital</h2>
+            
+            <!-- AQUI CARREGAMOS O SEU CARDÁPIO QUE VOCÊ JÁ TEM -->
+            <iframe src="https://cardapio.ai/a-toca" title="Cardápio Digital A TOCA"></iframe>
+
+            <div class="cardapio-container" style="margin-top:20px;">
+                <h3 style="color:#5B2182; margin-bottom:10px;">Edição Rápida (Altera em TODOS os aplicativos)</h3>
+                
+                <div class="item-cardapio">
+                    <span>Suco de Melancia</span>
+                    <div>
+                        <input type="text" class="input-preco" value="7,90">
+                        <button class="btn-salvar">Salvar</button>
+                    </div>
+                </div>
+
+                <div class="item-cardapio">
+                    <span>Tapioca com Ovo</span>
+                    <div>
+                        <input type="text" class="input-preco" value="8,90">
+                        <button class="btn-salvar">Salvar</button>
+                    </div>
+                </div>
+
+                <div class="item-cardapio">
+                    <span>Combo Melancia + Tapioca</span>
+                    <div>
+                        <input type="text" class="input-preco" value="15,99">
+                        <button class="btn-salvar">Salvar</button>
+                    </div>
+                </div>
+
+                <div class="item-cardapio">
+                    <span>Caldo Verde</span>
+                    <div>
+                        <input type="text" class="input-preco" value="12,90">
+                        <button class="btn-salvar">Salvar</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- SEÇÃO 3: CONEXÕES COM OS APPS -->
+        <div id="integracao" class="secao">
+            <h2 class="titulo-secao">🔌 Configuração das Integrações</h2>
+            <div class="cardapio-container">
+                <p style="margin-bottom:15px; color:#666;">Aqui você vai inserir as chaves de acesso que pegar dentro de cada aplicativo parceiro.</p>
+
+                <div style="margin-bottom:15px; padding:10px; border-left:4px solid #EA1D2C; background:#fef2f3;">
+                    <h4>🔵 iFood</h4>
+                    <p>Token de Acesso: <input type="text" placeholder="Cole sua chave aqui" style="width:70%; padding:5px; margin-top:5px;"> <button class="btn-salvar">Conectar</button></p>
+                </div>
+
+                <div style="margin-bottom:15px; padding:10px; border-left:4px solid #FFBE00; background:#fffbeb;">
+                    <h4>🟡 99Food</h4>
+                    <p>Chave API: <input type="text" placeholder="Cole sua chave aqui" style="width:70%; padding:5px; margin-top:5px;"> <button class="btn-salvar">Conectar</button></p>
+                </div>
+
+                <div style="margin-bottom:15px; padding:10px; border-left:4px solid #165DFF; background:#eff6ff;">
+                    <h4>🟢 Keeta</h4>
+                    <p>Chave de Integração: <input type="text" placeholder="Cole sua chave aqui" style="width:70%; padding:5px; margin-top:5px;"> <button class="btn-salvar">Conectar</button></p>
+                </div>
+
+                <div style="margin-bottom:15px; padding:10px; border-left:4px solid #6B21A8; background:#f8f5fc;">
+                    <h4>📋 Seu Cardápio</h4>
+                    <p>Link: <input type="text" value="https://cardapio.ai/a-toca" style="width:70%; padding:5px; margin-top:5px;" readonly> <span style="color:green; font-weight:bold;">✅ Integrado</span></p>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- SEÇÃO 4: RELATÓRIOS -->
+        <div id="relatorios" class="secao">
+            <h2 class="titulo-secao">📊 Relatórios de Vendas</h2>
+            <div class="cardapio-container">
+                <p><strong>Total vendido hoje:</strong> R$ 128,50</p>
+                <p><strong>Pedidos recebidos:</strong> 8</p>
+                <p><strong>Produto mais vendido:</strong> Combo Melancia + Tapioca</p>
+                <hr style="margin:15px 0;">
+                <p style="color:#666; font-size:14px;">* Os valores são atualizados automaticamente conforme os pedidos chegam.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <footer>
+        <p>© 2026 A TOCA | Sistema de Gerenciamento Integrado</p>
+    </footer>
+
+    <script>
+        // Função para trocar de aba
+        function abrirSecao(nomeSecao) {
+            document.querySelectorAll('.secao').forEach(secao => {
+                secao.classList.remove('ativa');
+            });
+            document.getElementById(nomeSecao).classList.add('ativa');
+        }
+
+        // Função para mostrar status do pedido
+        function atualizarStatus(botao, status) {
+            const card = botao.closest('.card-pedido');
+            const statusEl = document.createElement('p');
+            statusEl.style.marginTop = '8px';
+            statusEl.style.fontWeight = 'bold';
+            statusEl.style.color = '#22c55e';
+            statusEl.textContent = `Status: ${status}`;
+            
+            // Remove status antigo se existir
+            const antigo = card.querySelector('p[style*="color:"]');
+            if(antigo) antigo.remove();
+            
+            card.appendChild(statusEl);
+            alert(`Pedido ${status} com sucesso! Essa alteração foi enviada para todos os aplicativos.`);
+        }
+    </script>
+
+</body>
+</html>
