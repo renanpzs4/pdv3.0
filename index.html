@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A TOCA | Sistema de Gerenciamento</title>
+    <title>A TOCA | Sistema de Pedidos Integrado</title>
     <style>
         * {
             margin: 0;
@@ -230,6 +230,17 @@
                 width: 100%;
             }
         }
+
+        /* CÓDIGOS DE INTEGRAÇÃO */
+        .codigo-integracao {
+            background-color: #eef2ff;
+            border: 1px solid #165DFF;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
@@ -238,6 +249,7 @@
         <div>
             <img src="logo.png" alt="Logo A TOCA" class="logo">
             <h1>Sistema Integrado - A TOCA</h1>
+            <p style="font-size:12px; margin-top:5px;">ID Oficial: <strong>202605221</strong></p>
         </div>
         <div>
             <p>📍 Viela das Rosas, 188 - Paraisópolis</p>
@@ -291,7 +303,7 @@
                         <p><strong>Valor:</strong> R$ 25,80</p>
                     </div>
                     <div class="acoes">
-                        <button class="btn btn-aceitar" onclick="atualizarStatus(this, 'Aceito')">Aceitar</button>
+                        <button class="btn btn-aceitar" onclick="atualizarStatus(this, 'Aceitar')">Aceitar</button>
                         <button class="btn btn-preparar" onclick="atualizarStatus(this, 'Preparando')">Preparar</button>
                         <button class="btn btn-pronto" onclick="atualizarStatus(this, 'Pronto')">Pronto</button>
                         <button class="btn btn-imprimir" onclick="imprimirPedido(this)">🖨️ Imprimir</button>
@@ -308,7 +320,7 @@
                         <p><strong>Valor:</strong> R$ 19,90</p>
                     </div>
                     <div class="acoes">
-                        <button class="btn btn-aceitar" onclick="atualizarStatus(this, 'Aceito')">Aceitar</button>
+                        <button class="btn btn-aceitar" onclick="atualizarStatus(this, 'Aceitar')">Aceitar</button>
                         <button class="btn btn-preparar" onclick="atualizarStatus(this, 'Preparando')">Preparar</button>
                         <button class="btn btn-pronto" onclick="atualizarStatus(this, 'Pronto')">Pronto</button>
                         <button class="btn btn-imprimir" onclick="imprimirPedido(this)">🖨️ Imprimir</button>
@@ -366,6 +378,12 @@
         <!-- SEÇÃO 3: CONEXÕES COM OS APPS -->
         <div id="integracao" class="secao">
             <h2 class="titulo-secao">🔌 Configuração das Integrações</h2>
+
+            <div class="codigo-integracao">
+                <strong>📌 CÓDIGO DO SEU SISTEMA (SÓ NÚMEROS):</strong> 202605221<br>
+                <small>Digite APENAS esses números na Keeta, 99Food e iFood</small>
+            </div>
+
             <div class="cardapio-container">
                 <p style="margin-bottom:15px; color:#666;">Aqui você vai inserir as chaves de acesso que pegar dentro de cada aplicativo parceiro.</p>
 
@@ -464,19 +482,16 @@
             window.print();
         }
 
-        // SIMULAÇÃO DE PEDIDO NOVO (quando integrar, isso vai vir automático da API)
+        // SIMULAÇÃO DE PEDIDO NOVO
         function novoPedidoRecebido(cardElement) {
             const impressaoAuto = document.getElementById('impressaoAutomatica').checked;
             if(impressaoAuto) {
-                // Espera 2 segundos para aparecer e imprime
                 setTimeout(() => {
                     const btnImprimir = cardElement.querySelector('.btn-imprimir');
                     imprimirPedido(btnImprimir);
                 }, 2000);
             }
         }
-
-        // AQUI É ONDE VOCÊ VAI COLOCAR O CÓDIGO DAS CHAVES DA KETA, 99 E IFOOD DEPOIS
     </script>
 
 </body>
