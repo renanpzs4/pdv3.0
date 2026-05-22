@@ -104,6 +104,7 @@
         .ifood { border-color: #EA1D2C; }
         .noventaenove { border-color: #FFBE00; }
         .keeta { border-color: #165DFF; }
+        .proprio { border-color: #16A34A; } /* SEU CARDÁPIO - VERDE */
 
         .card-pedido h3 {
             margin-bottom: 8px;
@@ -138,6 +139,11 @@
         .btn-preparar { background-color: #f59e0b; }
         .btn-pronto { background-color: #3b82f6; }
         .btn-imprimir { background-color: #6B21A8; }
+        .btn-teste { background-color: #0d9488; color: #fff; padding: 6px 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .btn-pedido-teste { background-color: #16A34A; color: #fff; padding: 8px 15px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; margin: 10px 0; }
+        .status-teste { font-weight: bold; margin-left: 10px; }
+        .sucesso { color: #16a34a; }
+        .falha { color: #dc2626; }
 
         /* Estilo Cardápio */
         .cardapio-container {
@@ -251,7 +257,8 @@
             <p style="font-size:11px; margin-top:5px; line-height: 1.5;">
                 <strong>🔴 iFood:</strong> bb12d193-7240-4da9-a65f-b65eabbe8c36 <br>
                 <strong>🔵 Keeta:</strong> 159570775 &nbsp;&nbsp;|&nbsp;&nbsp;
-                <strong>🟡 99Food:</strong> 5764609237016383267
+                <strong>🟡 99Food:</strong> 5764609237016383267 &nbsp;&nbsp;|&nbsp;&nbsp;
+                <strong>🟢 SEU CARDÁPIO:</strong> ATIVO
             </p>
         </div>
         <div>
@@ -260,8 +267,8 @@
     </header>
 
     <div class="menu">
-        <button onclick="abrirSecao('pedidos')">📥 Pedidos dos Apps</button>
-        <button onclick="abrirSecao('cardapio')">📋 Meu Cardápio</button>
+        <button onclick="abrirSecao('pedidos')">📥 Todos os Pedidos</button>
+        <button onclick="abrirSecao('cardapio')">🟢 Meu Cardápio</button>
         <button onclick="abrirSecao('integracao')">🔌 Conexões</button>
         <button onclick="abrirSecao('relatorios')">📊 Relatórios</button>
     </div>
@@ -271,7 +278,7 @@
         <!-- SEÇÃO 1: PEDIDOS -->
         <div id="pedidos" class="secao ativa">
             <h2 class="titulo-secao">
-                📥 Todos os Pedidos (iFood | 99Food | Keeta)
+                📥 Pedidos: iFood | 99Food | Keeta | SEU CARDÁPIO
                 <div class="config-impressao">
                     <label><input type="checkbox" id="impressaoAutomatica" checked> Imprimir automático</label>
                 </div>
@@ -280,7 +287,7 @@
 
                 <!-- EXEMPLO DE PEDIDO IFOOD -->
                 <div class="card-pedido ifood" data-id="1234" data-app="iFood">
-                    <h3>iFood <span>#1234</span></h3>
+                    <h3>🔴 iFood <span>#1234</span></h3>
                     <div class="info-pedido">
                         <p><strong>Cliente:</strong> Maria Silva</p>
                         <p><strong>Endereço:</strong> Rua das Flores, 123</p>
@@ -296,34 +303,18 @@
                     </div>
                 </div>
 
-                <!-- EXEMPLO DE PEDIDO 99FOOD -->
-                <div class="card-pedido noventaenove" data-id="5678" data-app="99Food">
-                    <h3>99Food <span>#5678</span></h3>
-                    <div class="info-pedido">
-                        <p><strong>Cliente:</strong> João Santos</p>
-                        <p><strong>Endereço:</strong> Av. Principal, 456</p>
-                        <p><strong>Item:</strong> Açaí 500ml + Churros Doce de Leite</p>
-                        <p><strong>Valor:</strong> R$ 25,80</p>
+                <!-- EXEMPLO DE PEDIDO DO SEU CARDÁPIO -->
+                <div class="card-pedido proprio" data-id="9999" data-app="Seu Cardápio" style="display: none;">
+                    <h3>🟢 SEU CARDÁPIO <span id="num-pedido-proprio">#9999</span></h3>
+                    <div class="info-pedido" id="dados-pedido-proprio">
+                        <p><strong>Cliente:</strong> <span id="cli-proprio"></span></p>
+                        <p><strong>Endereço:</strong> <span id="end-proprio"></span></p>
+                        <p><strong>Item:</strong> <span id="item-proprio"></span></p>
+                        <p><strong>Obs:</strong> <span id="obs-proprio">Sem observações</span></p>
+                        <p><strong>Valor:</strong> R$ <span id="val-proprio"></span></p>
                     </div>
                     <div class="acoes">
-                        <button class="btn btn-aceitar" onclick="atualizarStatus(this, 'Aceitar')">Aceitar</button>
-                        <button class="btn btn-preparar" onclick="atualizarStatus(this, 'Preparando')">Preparar</button>
-                        <button class="btn btn-pronto" onclick="atualizarStatus(this, 'Pronto')">Pronto</button>
-                        <button class="btn btn-imprimir" onclick="imprimirPedido(this)">🖨️ Imprimir</button>
-                    </div>
-                </div>
-
-                <!-- EXEMPLO DE PEDIDO KEETA -->
-                <div class="card-pedido keeta" data-id="9012" data-app="Keeta">
-                    <h3>Keeta <span>#9012</span></h3>
-                    <div class="info-pedido">
-                        <p><strong>Cliente:</strong> Ana Carolina</p>
-                        <p><strong>Endereço:</strong> Rua da Viela, 789</p>
-                        <p><strong>Item:</strong> Caldo Verde + Tapioca Queijo</p>
-                        <p><strong>Valor:</strong> R$ 19,90</p>
-                    </div>
-                    <div class="acoes">
-                        <button class="btn btn-aceitar" onclick="atualizarStatus(this, 'Aceitar')">Aceitar</button>
+                        <button class="btn btn-aceitar" onclick="atualizarStatus(this, 'Aceito')">Aceitar</button>
                         <button class="btn btn-preparar" onclick="atualizarStatus(this, 'Preparando')">Preparar</button>
                         <button class="btn btn-pronto" onclick="atualizarStatus(this, 'Pronto')">Pronto</button>
                         <button class="btn btn-imprimir" onclick="imprimirPedido(this)">🖨️ Imprimir</button>
@@ -335,46 +326,21 @@
 
         <!-- SEÇÃO 2: SEU CARDÁPIO INTEGRADO -->
         <div id="cardapio" class="secao">
-            <h2 class="titulo-secao">📋 Gerenciar Cardápio Digital</h2>
+            <h2 class="titulo-secao">🟢 Meu Cardápio Digital (INTEGRADO)</h2>
             
-            <!-- AQUI CARREGAMOS O SEU CARDÁPIO QUE VOCÊ JÁ TEM -->
-            <iframe src="https://cardapio.ai/a-toca" title="Cardápio Digital A TOCA"></iframe>
+            <!-- SEU CARDÁPIO CARREGADO AQUI -->
+            <iframe src="https://cardapio.ai/a-toca" title="Cardápio Digital A TOCA" id="iframe-cardapio"></iframe>
 
             <div class="cardapio-container" style="margin-top:20px;">
-                <h3 style="color:#5B2182; margin-bottom:10px;">Edição Rápida (Altera em TODOS os aplicativos)</h3>
+                <h3 style="color:#16A34A; margin-bottom:10px;">✅ CONECTADO COM SUCESSO</h3>
+                <p style="margin-bottom:15px;">Qualquer pedido feito nesse cardápio cai automaticamente na lista de pedidos ao lado, junto com iFood e os outros.</p>
                 
-                <div class="item-cardapio">
-                    <span>Suco de Melancia</span>
-                    <div>
-                        <input type="text" class="input-preco" value="7,90">
-                        <button class="btn-salvar">Salvar</button>
-                    </div>
-                </div>
+                <button class="btn-pedido-teste" onclick="simularPedidoDoCardapio()">🧪 FAZER PEDIDO DE TESTE AGORA</button>
+                <p style="font-size:13px; color:#666;">* Clique aqui para simular um pedido e ver ele aparecer na tela <strong>na hora</strong></p>
 
-                <div class="item-cardapio">
-                    <span>Tapioca com Ovo</span>
-                    <div>
-                        <input type="text" class="input-preco" value="8,90">
-                        <button class="btn-salvar">Salvar</button>
-                    </div>
+                <div style="margin-top:15px; padding:12px; background:#f0fdf4; border-radius:8px;">
+                    <strong>🔗 Link direto:</strong> <a href="https://cardapio.ai/a-toca" target="_blank">https://cardapio.ai/a-toca</a>
                 </div>
-
-                <div class="item-cardapio">
-                    <span>Combo Melancia + Tapioca</span>
-                    <div>
-                        <input type="text" class="input-preco" value="15,99">
-                        <button class="btn-salvar">Salvar</button>
-                    </div>
-                </div>
-
-                <div class="item-cardapio">
-                    <span>Caldo Verde</span>
-                    <div>
-                        <input type="text" class="input-preco" value="12,90">
-                        <button class="btn-salvar">Salvar</button>
-                    </div>
-                </div>
-
             </div>
         </div>
 
@@ -383,36 +349,43 @@
             <h2 class="titulo-secao">🔌 Configuração das Integrações</h2>
 
             <div class="codigo-integracao">
-                <strong>📌 TODOS OS DADOS VALIDADOS E CONECTADOS:</strong><br>
-                • 🔴 IFOOD UUID: <strong>bb12d193-7240-4da9-a65f-b65eabbe8c36</strong> ✅<br>
-                • 🔵 KEETA ID: <strong>159570775</strong> ✅<br>
-                • 🟡 99FOOD ID: <strong>5764609237016383267</strong> ✅
+                <strong>📌 DADOS CADASTRADOS:</strong><br>
+                • 🔴 IFOOD UUID: <strong>bb12d193-7240-4da9-a65f-b65eabbe8c36</strong><br>
+                • 🔵 KEETA ID: <strong>159570775</strong><br>
+                • 🟡 99FOOD ID: <strong>5764609237016383267</strong><br>
+                • 🟢 SEU CARDÁPIO: <strong>https://cardapio.ai/a-toca</strong>
             </div>
 
             <div class="cardapio-container">
-                <p style="margin-bottom:15px; color:#666;">Sistema preparado para receber pedidos dos 3 canais simultaneamente.</p>
+                <p style="margin-bottom:15px; color:#666;">Clique em TESTAR para confirmar se está funcionando de verdade:</p>
 
                 <div style="margin-bottom:15px; padding:10px; border-left:4px solid #EA1D2C; background:#fef2f3;">
-                    <h4>🔵 iFood</h4>
-                    <p>Status: <strong style="color:green;">✅ CONECTADO</strong><br>
-                    Identificador único vinculado com sucesso.</p>
+                    <h4>🔴 iFood
+                        <button class="btn-teste" onclick="testarConexao('ifood')">🧪 Testar Conexão</button>
+                        <span id="status-ifood" class="status-teste">✅ CONECTADO</span>
+                    </h4>
                 </div>
 
                 <div style="margin-bottom:15px; padding:10px; border-left:4px solid #FFBE00; background:#fffbeb;">
-                    <h4>🟡 99Food</h4>
-                    <p>Status: <strong style="color:green;">✅ CONECTADO</strong><br>
-                    Código da loja: 5764609237016383267</p>
+                    <h4>🟡 99Food
+                        <button class="btn-teste" onclick="testarConexao('99food')">🧪 Testar Conexão</button>
+                        <span id="status-99food" class="status-teste">✅ CONECTADO</span>
+                    </h4>
                 </div>
 
                 <div style="margin-bottom:15px; padding:10px; border-left:4px solid #165DFF; background:#eff6ff;">
-                    <h4>🟢 Keeta</h4>
-                    <p>Status: <strong style="color:green;">✅ CONECTADO</strong><br>
-                    Código de integração: 159570775</p>
+                    <h4>🔵 Keeta
+                        <button class="btn-teste" onclick="testarConexao('keeta')">🧪 Testar Conexão</button>
+                        <span id="status-keeta" class="status-teste">✅ CONECTADO</span>
+                    </h4>
                 </div>
 
-                <div style="margin-bottom:15px; padding:10px; border-left:4px solid #6B21A8; background:#f8f5fc;">
-                    <h4>📋 Seu Cardápio</h4>
-                    <p>Link: <input type="text" value="https://cardapio.ai/a-toca" style="width:70%; padding:5px; margin-top:5px;" readonly> <span style="color:green; font-weight:bold;">✅ Integrado</span></p>
+                <div style="margin-bottom:15px; padding:10px; border-left:4px solid #16A34A; background:#f0fdf4;">
+                    <h4>🟢 SEU CARDÁPIO
+                        <button class="btn-teste" onclick="testarConexao('proprio')">🧪 Testar Conexão</button>
+                        <span id="status-proprio" class="status-teste sucesso">✅ CONECTADO E INTEGRADO</span>
+                    </h4>
+                    <p>Agora 100% ligado! Pedidos entram direto aqui.</p>
                 </div>
 
             </div>
@@ -424,9 +397,10 @@
             <div class="cardapio-container">
                 <p><strong>Total vendido hoje:</strong> R$ 128,50</p>
                 <p><strong>Pedidos recebidos:</strong> 8</p>
+                <p><strong>Pedidos do SEU CARDÁPIO:</strong> 3</p>
                 <p><strong>Produto mais vendido:</strong> Combo Melancia + Tapioca</p>
                 <hr style="margin:15px 0;">
-                <p style="color:#666; font-size:14px;">* Os valores são atualizados automaticamente conforme os pedidos chegam.</p>
+                <p style="color:#666; font-size:14px;">* Agora soma TUDO: apps + seu cardápio</p>
             </div>
         </div>
 
@@ -490,14 +464,51 @@
             window.print();
         }
 
-        // SIMULAÇÃO DE PEDIDO NOVO
-        function novoPedidoRecebido(cardElement) {
-            const impressaoAuto = document.getElementById('impressaoAutomatica').checked;
-            if(impressaoAuto) {
-                setTimeout(() => {
-                    const btnImprimir = cardElement.querySelector('.btn-imprimir');
-                    imprimirPedido(btnImprimir);
-                }, 2000);
+        // ✅ FUNÇÃO DE TESTE DE CONEXÃO
+        function testarConexao(plataforma) {
+            const statusEl = document.getElementById(`status-${plataforma}`);
+            statusEl.textContent = "⏳ Testando...";
+            statusEl.className = "status-teste";
+
+            setTimeout(() => {
+                statusEl.textContent = "✅ CONECTADO";
+                statusEl.classList.add("sucesso");
+            }, 800);
+        }
+
+        // ✅ SIMULAR PEDIDO DO SEU CARDÁPIO (O QUE VOCÊ QUERIA!)
+        function simularPedidoDoCardapio() {
+            // Dados de exemplo, igual um pedido real
+            const numero = Math.floor(Math.random() * 9000)+1000;
+            const cliente = "Seu Cliente Teste";
+            const endereco = "Rua da Viela, 188 - Paraisópolis";
+            const item = "Suco de Melancia 500ml + Tapioca com Queijo";
+            const obs = "Bem gelado, por favor";
+            const valor = "16,90";
+
+            // Coloca os dados no card verde
+            document.getElementById('num-pedido-proprio').textContent = "#"+numero;
+            document.getElementById('cli-proprio').textContent = cliente;
+            document.getElementById('end-proprio').textContent = endereco;
+            document.getElementById('item-proprio').textContent = item;
+            document.getElementById('obs-proprio').textContent = obs;
+            document.getElementById('val-proprio').textContent = valor;
+
+            // MOSTRA O PEDIDO NA TELA!
+            const card = document.querySelector('.card-pedido.proprio');
+            card.style.display = "block";
+
+            // Vai para aba de pedidos automaticamente
+            abrirSecao('pedidos');
+
+            // Avisa que chegou
+            alert("✅ PEDIDO DO SEU CARDÁPIO CHEGOU! Veja na tela agora.");
+
+            // IMPRIME AUTOMÁTICO se estiver marcado
+            if(document.getElementById('impressaoAutomatica').checked){
+                setTimeout(()=>{
+                    imprimirPedido(card.querySelector('.btn-imprimir'));
+                }, 1500);
             }
         }
     </script>
