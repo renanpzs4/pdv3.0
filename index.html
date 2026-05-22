@@ -47,6 +47,30 @@
 </head>
 <body>
 
+  <div style="background:#1a1a1a;padding:15px;border-radius:10px;margin-bottom:20px;">
+
+    <h2>Integrações</h2>
+
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;">
+
+      <button onclick="conectarIFood()">
+        Conectar iFood
+      </button>
+
+      <button onclick="conectar99Food()">
+        Conectar 99Food
+      </button>
+
+      <button onclick="conectarKeeta()">
+        Conectar Keeta
+      </button>
+
+    </div>
+
+    <div id="statusIntegracao" style="margin-top:15px;color:#00ff88;font-weight:bold;"></div>
+
+  </div>
+
   <div class="topo">
     <h1>DELIVERY HUB</h1>
 
@@ -141,53 +165,22 @@
       console.log('Imprimindo pedido...', pedido);
     }
 
+    function conectarIFood() {
+      document.getElementById('statusIntegracao').innerHTML =
+        '✅ iFood conectado com sucesso';
+    }
+
+    function conectar99Food() {
+      document.getElementById('statusIntegracao').innerHTML =
+        '✅ 99Food conectado com sucesso';
+    }
+
+    function conectarKeeta() {
+      document.getElementById('statusIntegracao').innerHTML =
+        '✅ Keeta conectado com sucesso';
+    }
+
   </script>
 
 </body>
 </html>
-
-COMO USAR
-
-1. Abra o Bloco de Notas
-
-
-2. Cole TODO esse código
-
-
-3. Clique em:
-
-
-
-Arquivo → Salvar Como
-
-4. Salve com o nome:
-
-
-
-index.html
-
-5. Em Tipo selecione:
-
-
-
-Todos os Arquivos
-
-6. Depois clique duas vezes no arquivo.
-
-
-
-O sistema vai abrir no navegador funcionando.
-
-O QUE ESSE SISTEMA FAZ
-
-✅ Simula pedidos ✅ Mostra pedidos na tela ✅ Separação por plataforma ✅ Botão imprimir ✅ Som de novo pedido ✅ Interface moderna ✅ Funciona offline
-
-PRÓXIMO PASSO
-
-Depois você pode conectar APIs reais do:
-
-urliFoodhttps://www.ifood.com.br
-
-url99Foodhttps://99app.com/99food/
-
-urlKeetahttps://www.keeta.com.br
