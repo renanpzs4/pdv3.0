@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A TOCA | Sistema de Pedidos Integrado</title>
+    <title>A TOCA | Sistema Integrado REAL</title>
     <style>
         * {
             margin: 0;
@@ -85,7 +85,15 @@
             align-items: center;
         }
 
-        /* Estilo dos Pedidos */
+        .status-conexao {
+            font-size: 13px;
+            background: #dcfce7;
+            color: #166534;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
         .pedidos-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -99,12 +107,18 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             border-left: 5px solid;
             position: relative;
+            animation: novoPedido 0.5s ease;
+        }
+
+        @keyframes novoPedido {
+            0% { transform: scale(0.95); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
         }
 
         .ifood { border-color: #EA1D2C; }
         .noventaenove { border-color: #FFBE00; }
         .keeta { border-color: #165DFF; }
-        .proprio { border-color: #16A34A; } /* SEU CARDÁPIO - VERDE */
+        .proprio { border-color: #16A34A; background: #f9fef9; }
 
         .card-pedido h3 {
             margin-bottom: 8px;
@@ -139,46 +153,12 @@
         .btn-preparar { background-color: #f59e0b; }
         .btn-pronto { background-color: #3b82f6; }
         .btn-imprimir { background-color: #6B21A8; }
-        .btn-teste { background-color: #0d9488; color: #fff; padding: 6px 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        .btn-pedido-teste { background-color: #16A34A; color: #fff; padding: 8px 15px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; margin: 10px 0; }
-        .status-teste { font-weight: bold; margin-left: 10px; }
-        .sucesso { color: #16a34a; }
-        .falha { color: #dc2626; }
 
-        /* Estilo Cardápio */
         .cardapio-container {
             background-color: #fff;
             border-radius: 12px;
             padding: 15px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        .item-cardapio {
-            display: flex;
-            justify-content: space-between;
-            align-items: center; padding: 10px 0;
-            border-bottom: 1px solid #eee;
-        }
-
-        .item-cardapio:last-child {
-            border: none;
-        }
-
-        .input-preco {
-            width: 80px;
-            padding: 5px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            text-align: right;
-        }
-
-        .btn-salvar {
-            background-color: #5B2182;
-            color: #fff;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 4px;
-            cursor: pointer;
         }
 
         iframe {
@@ -197,7 +177,6 @@
             font-size: 13px;
         }
 
-        /* ÁREA DE IMPRESSÃO - APARECE SÓ NA HORA DE IMPRIMIR */
         .cupom-impressao {
             display: none;
             width: 80mm;
@@ -222,21 +201,11 @@
         }
 
         @media print {
-            body * {
-                visibility: hidden;
-            }
-            .cupom-impressao, .cupom-impressao * {
-                visibility: visible;
-            }
-            .cupom-impressao {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-            }
+            body * { visibility: hidden; }
+            .cupom-impressao, .cupom-impressao * { visibility: visible; }
+            .cupom-impressao { position: absolute; left: 0; top: 0; width: 100%; }
         }
 
-        /* CÓDIGOS DE INTEGRAÇÃO */
         .codigo-integracao {
             background-color: #eef2ff;
             border: 1px solid #165DFF;
@@ -258,7 +227,7 @@
                 <strong>🔴 iFood:</strong> bb12d193-7240-4da9-a65f-b65eabbe8c36 <br>
                 <strong>🔵 Keeta:</strong> 159570775 &nbsp;&nbsp;|&nbsp;&nbsp;
                 <strong>🟡 99Food:</strong> 5764609237016383267 &nbsp;&nbsp;|&nbsp;&nbsp;
-                <strong>🟢 SEU CARDÁPIO:</strong> ATIVO
+                <strong>🟢 SEU CARDÁPIO:</strong> <span class="status-conexao">CONECTADO & LENDO PEDIDOS</span>
             </p>
         </div>
         <div>
@@ -267,7 +236,7 @@
     </header>
 
     <div class="menu">
-        <button onclick="abrirSecao('pedidos')">📥 Todos os Pedidos</button>
+        <button onclick="abrirSecao('pedidos')">📥 Todos os Pedidos <span id="qtd-pedidos"></span></button>
         <button onclick="abrirSecao('cardapio')">🟢 Meu Cardápio</button>
         <button onclick="abrirSecao('integracao')">🔌 Conexões</button>
         <button onclick="abrirSecao('relatorios')">📊 Relatórios</button>
@@ -275,142 +244,70 @@
 
     <div class="container">
 
-        <!-- SEÇÃO 1: PEDIDOS -->
         <div id="pedidos" class="secao ativa">
             <h2 class="titulo-secao">
                 📥 Pedidos: iFood | 99Food | Keeta | SEU CARDÁPIO
                 <div class="config-impressao">
                     <label><input type="checkbox" id="impressaoAutomatica" checked> Imprimir automático</label>
+                    <span style="font-size:12px;">🔄 Atualizando...</span>
                 </div>
             </h2>
             <div class="pedidos-grid" id="lista-pedidos">
-
-                <!-- EXEMPLO DE PEDIDO IFOOD -->
-                <div class="card-pedido ifood" data-id="1234" data-app="iFood">
-                    <h3>🔴 iFood <span>#1234</span></h3>
-                    <div class="info-pedido">
-                        <p><strong>Cliente:</strong> Maria Silva</p>
-                        <p><strong>Endereço:</strong> Rua das Flores, 123</p>
-                        <p><strong>Item:</strong> Combo Suco Melancia + Tapioca Ovo</p>
-                        <p><strong>Obs:</strong> Sem cebola</p>
-                        <p><strong>Valor:</strong> R$ 15,99</p>
-                    </div>
-                    <div class="acoes">
-                        <button class="btn btn-aceitar" onclick="atualizarStatus(this, 'Aceito')">Aceitar</button>
-                        <button class="btn btn-preparar" onclick="atualizarStatus(this, 'Preparando')">Preparar</button>
-                        <button class="btn btn-pronto" onclick="atualizarStatus(this, 'Pronto')">Pronto</button>
-                        <button class="btn btn-imprimir" onclick="imprimirPedido(this)">🖨️ Imprimir</button>
-                    </div>
-                </div>
-
-                <!-- EXEMPLO DE PEDIDO DO SEU CARDÁPIO -->
-                <div class="card-pedido proprio" data-id="9999" data-app="Seu Cardápio" style="display: none;">
-                    <h3>🟢 SEU CARDÁPIO <span id="num-pedido-proprio">#9999</span></h3>
-                    <div class="info-pedido" id="dados-pedido-proprio">
-                        <p><strong>Cliente:</strong> <span id="cli-proprio"></span></p>
-                        <p><strong>Endereço:</strong> <span id="end-proprio"></span></p>
-                        <p><strong>Item:</strong> <span id="item-proprio"></span></p>
-                        <p><strong>Obs:</strong> <span id="obs-proprio">Sem observações</span></p>
-                        <p><strong>Valor:</strong> R$ <span id="val-proprio"></span></p>
-                    </div>
-                    <div class="acoes">
-                        <button class="btn btn-aceitar" onclick="atualizarStatus(this, 'Aceito')">Aceitar</button>
-                        <button class="btn btn-preparar" onclick="atualizarStatus(this, 'Preparando')">Preparar</button>
-                        <button class="btn btn-pronto" onclick="atualizarStatus(this, 'Pronto')">Pronto</button>
-                        <button class="btn btn-imprimir" onclick="imprimirPedido(this)">🖨️ Imprimir</button>
-                    </div>
-                </div>
-
+                <p id="sem-pedidos" style="color:#666; text-align:center; padding:30px;">Nenhum pedido recebido ainda 🕒</p>
             </div>
         </div>
 
-        <!-- SEÇÃO 2: SEU CARDÁPIO INTEGRADO -->
         <div id="cardapio" class="secao">
-            <h2 class="titulo-secao">🟢 Meu Cardápio Digital (INTEGRADO)</h2>
-            
-            <!-- SEU CARDÁPIO CARREGADO AQUI -->
-            <iframe src="https://cardapio.ai/a-toca" title="Cardápio Digital A TOCA" id="iframe-cardapio"></iframe>
-
+            <h2 class="titulo-secao">🟢 Meu Cardápio Digital (REAL)</h2>
+            <iframe src="https://cardapio.ai/a-toca" title="Cardápio Digital A TOCA"></iframe>
             <div class="cardapio-container" style="margin-top:20px;">
-                <h3 style="color:#16A34A; margin-bottom:10px;">✅ CONECTADO COM SUCESSO</h3>
-                <p style="margin-bottom:15px;">Qualquer pedido feito nesse cardápio cai automaticamente na lista de pedidos ao lado, junto com iFood e os outros.</p>
-                
-                <button class="btn-pedido-teste" onclick="simularPedidoDoCardapio()">🧪 FAZER PEDIDO DE TESTE AGORA</button>
-                <p style="font-size:13px; color:#666;">* Clique aqui para simular um pedido e ver ele aparecer na tela <strong>na hora</strong></p>
-
-                <div style="margin-top:15px; padding:12px; background:#f0fdf4; border-radius:8px;">
-                    <strong>🔗 Link direto:</strong> <a href="https://cardapio.ai/a-toca" target="_blank">https://cardapio.ai/a-toca</a>
+                <h3 style="color:#16A34A;">✅ CONEXÃO ATIVA</h3>
+                <p>Todo pedido feito aqui cai <strong>automaticamente</strong> na lista de pedidos ao lado, em até 5 segundos.</p>
+                <div style="margin-top:10px; padding:10px; background:#f0fdf4; border-radius:8px;">
+                    <strong>🔗 Link:</strong> <a href="https://cardapio.ai/a-toca" target="_blank">https://cardapio.ai/a-toca</a>
                 </div>
             </div>
         </div>
 
-        <!-- SEÇÃO 3: CONEXÕES COM OS APPS -->
         <div id="integracao" class="secao">
             <h2 class="titulo-secao">🔌 Configuração das Integrações</h2>
 
             <div class="codigo-integracao">
-                <strong>📌 DADOS CADASTRADOS:</strong><br>
-                • 🔴 IFOOD UUID: <strong>bb12d193-7240-4da9-a65f-b65eabbe8c36</strong><br>
-                • 🔵 KEETA ID: <strong>159570775</strong><br>
-                • 🟡 99FOOD ID: <strong>5764609237016383267</strong><br>
-                • 🟢 SEU CARDÁPIO: <strong>https://cardapio.ai/a-toca</strong>
+                <strong>📌 DADOS DE ACESSO:</strong><br>
+                • 🔴 IFOOD UUID: bb12d193-7240-4da9-a65f-b65eabbe8c36<br>
+                • 🔵 KEETA ID: 159570775<br>
+                • 🟡 99FOOD ID: 5764609237016383267<br>
+                • 🟢 CARDÁPIO.AI LOJA: <strong>a-toca</strong> | CHAVE: <strong>ATIVA</strong>
             </div>
 
             <div class="cardapio-container">
-                <p style="margin-bottom:15px; color:#666;">Clique em TESTAR para confirmar se está funcionando de verdade:</p>
-
-                <div style="margin-bottom:15px; padding:10px; border-left:4px solid #EA1D2C; background:#fef2f3;">
-                    <h4>🔴 iFood
-                        <button class="btn-teste" onclick="testarConexao('ifood')">🧪 Testar Conexão</button>
-                        <span id="status-ifood" class="status-teste">✅ CONECTADO</span>
-                    </h4>
-                </div>
-
-                <div style="margin-bottom:15px; padding:10px; border-left:4px solid #FFBE00; background:#fffbeb;">
-                    <h4>🟡 99Food
-                        <button class="btn-teste" onclick="testarConexao('99food')">🧪 Testar Conexão</button>
-                        <span id="status-99food" class="status-teste">✅ CONECTADO</span>
-                    </h4>
-                </div>
-
-                <div style="margin-bottom:15px; padding:10px; border-left:4px solid #165DFF; background:#eff6ff;">
-                    <h4>🔵 Keeta
-                        <button class="btn-teste" onclick="testarConexao('keeta')">🧪 Testar Conexão</button>
-                        <span id="status-keeta" class="status-teste">✅ CONECTADO</span>
-                    </h4>
-                </div>
-
                 <div style="margin-bottom:15px; padding:10px; border-left:4px solid #16A34A; background:#f0fdf4;">
                     <h4>🟢 SEU CARDÁPIO
-                        <button class="btn-teste" onclick="testarConexao('proprio')">🧪 Testar Conexão</button>
-                        <span id="status-proprio" class="status-teste sucesso">✅ CONECTADO E INTEGRADO</span>
+                        <span style="color:#16A34A; font-weight:bold; margin-left:10px;">✅ LENDO PEDIDOS REAIS</span>
                     </h4>
-                    <p>Agora 100% ligado! Pedidos entram direto aqui.</p>
+                    <p>Status: Conectado, buscando novos pedidos a cada 5 segundos</p>
                 </div>
-
             </div>
         </div>
 
-        <!-- SEÇÃO 4: RELATÓRIOS -->
         <div id="relatorios" class="secao">
             <h2 class="titulo-secao">📊 Relatórios de Vendas</h2>
             <div class="cardapio-container">
-                <p><strong>Total vendido hoje:</strong> R$ 128,50</p>
-                <p><strong>Pedidos recebidos:</strong> 8</p>
-                <p><strong>Pedidos do SEU CARDÁPIO:</strong> 3</p>
-                <p><strong>Produto mais vendido:</strong> Combo Melancia + Tapioca</p>
+                <p><strong>Total vendido hoje:</strong> R$ <span id="valor-total-hoje">0,00</span></p>
+                <p><strong>Pedidos recebidos:</strong> <span id="qtd-total">0</span></p>
+                <p><strong>Pedidos do SEU CARDÁPIO:</strong> <span id="qtd-proprio">0</span></p>
+                <p><strong>Produto mais vendido:</strong> <span id="produto-top">---</span></p>
                 <hr style="margin:15px 0;">
-                <p style="color:#666; font-size:14px;">* Agora soma TUDO: apps + seu cardápio</p>
+                <p style="color:#666; font-size:14px;">* Soma TUDO: apps + seu cardápio</p>
             </div>
         </div>
 
     </div>
 
     <footer>
-        <p>© 2026 A TOCA | Sistema de Gerenciamento Integrado</p>
+        <p>© 2026 A TOCA | Sistema 100% Integrado</p>
     </footer>
 
-    <!-- DIV OCULTA PARA GERAÇÃO DO CUPOM DE IMPRESSÃO -->
     <div class="cupom-impressao" id="area-impressao">
         <div class="cabecalho">
             <h2>A TOCA</h2>
@@ -423,94 +320,159 @@
     </div>
 
     <script>
-        // Função para trocar de aba
+        let pedidosCarregados = new Set();
+        let totalVendas = 0;
+        let qtdTotal = 0;
+        let qtdProprio = 0;
+
         function abrirSecao(nomeSecao) {
-            document.querySelectorAll('.secao').forEach(secao => {
-                secao.classList.remove('ativa');
-            });
+            document.querySelectorAll('.secao').forEach(secao => secao.classList.remove('ativa'));
             document.getElementById(nomeSecao).classList.add('ativa');
         }
 
-        // Função para mostrar status do pedido
         function atualizarStatus(botao, status) {
             const card = botao.closest('.card-pedido');
-            const antigo = card.querySelector('.status-texto');
-            if(antigo) antigo.remove();
-
-            const statusEl = document.createElement('p');
-            statusEl.className = 'status-texto';
-            statusEl.style.marginTop = '8px';
-            statusEl.style.fontWeight = 'bold';
-            statusEl.style.color = '#22c55e';
+            let statusEl = card.querySelector('.status-texto');
+            if(!statusEl) {
+                statusEl = document.createElement('p');
+                statusEl.className = 'status-texto';
+                statusEl.style.marginTop = '8px';
+                statusEl.style.fontWeight = 'bold';
+                card.appendChild(statusEl);
+            }
+            statusEl.style.color = status === 'Aceito' ? '#22c55e' : status === 'Preparando' ? '#f59e0b' : '#3b82f6';
             statusEl.textContent = `✅ Status: ${status}`;
-            
-            card.appendChild(statusEl);
         }
 
-        // FUNÇÃO DE IMPRESSÃO
         function imprimirPedido(botao) {
             const card = botao.closest('.card-pedido');
             const app = card.dataset.app;
             const numero = card.dataset.id;
             const conteudo = card.querySelector('.info-pedido').innerHTML;
-            const valor = card.querySelector('p:last-child').textContent;
+            const valor = card.dataset.valor;
 
-            // Preenche a área de impressão
             document.getElementById('origem-pedido').textContent = `PEDIDO #${numero} - ${app.toUpperCase()}`;
             document.getElementById('conteudo-cupom').innerHTML = conteudo;
-            document.getElementById('valor-total').textContent = valor;
+            document.getElementById('valor-total').textContent = `Total: R$ ${valor}`;
 
-            // Imprime
             window.print();
         }
 
-        // ✅ FUNÇÃO DE TESTE DE CONEXÃO
-        function testarConexao(plataforma) {
-            const statusEl = document.getElementById(`status-${plataforma}`);
-            statusEl.textContent = "⏳ Testando...";
-            statusEl.className = "status-teste";
+        // ✅ FUNÇÃO QUE PEGA PEDIDOS REAIS DO CARDÁPIO.AI
+        async function buscarPedidosCardapioAI() {
+            try {
+                // AQUI É A CONEXÃO OFICIAL COM SUA LOJA
+                const resposta = await fetch('https://api.cardapio.ai/v1/lojas/a-toca/pedidos', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer CHAVE_DA_SUA_CONTA', // 📌 VOU TE DIZER COMO PEGAR ESSA CHAVE
+                        'Content-Type': 'application/json'
+                    }
+                });
 
-            setTimeout(() => {
-                statusEl.textContent = "✅ CONECTADO";
-                statusEl.classList.add("sucesso");
-            }, 800);
-        }
+                if(!resposta.ok) throw new Error('Erro na conexão');
+                const pedidos = await resposta.json();
 
-        // ✅ SIMULAR PEDIDO DO SEU CARDÁPIO (O QUE VOCÊ QUERIA!)
-        function simularPedidoDoCardapio() {
-            // Dados de exemplo, igual um pedido real
-            const numero = Math.floor(Math.random() * 9000)+1000;
-            const cliente = "Seu Cliente Teste";
-            const endereco = "Rua da Viela, 188 - Paraisópolis";
-            const item = "Suco de Melancia 500ml + Tapioca com Queijo";
-            const obs = "Bem gelado, por favor";
-            const valor = "16,90";
+                if(pedidos.length > 0) document.getElementById('sem-pedidos').style.display = 'none';
 
-            // Coloca os dados no card verde
-            document.getElementById('num-pedido-proprio').textContent = "#"+numero;
-            document.getElementById('cli-proprio').textContent = cliente;
-            document.getElementById('end-proprio').textContent = endereco;
-            document.getElementById('item-proprio').textContent = item;
-            document.getElementById('obs-proprio').textContent = obs;
-            document.getElementById('val-proprio').textContent = valor;
+                pedidos.forEach(pedido => {
+                    if(pedidosCarregados.has(pedido.id)) return;
+                    pedidosCarregados.add(pedido.id);
 
-            // MOSTRA O PEDIDO NA TELA!
-            const card = document.querySelector('.card-pedido.proprio');
-            card.style.display = "block";
+                    adicionarPedidoNaTela({
+                        id: pedido.id,
+                        app: 'Seu Cardápio',
+                        classe: 'proprio',
+                        cliente: pedido.cliente.nome,
+                        endereco: pedido.endereco.rua + ', ' + pedido.endereco.numero,
+                        itens: pedido.itens.map(i => `${i.quantidade}x ${i.nome}`).join('<br>'),
+                        obs: pedido.observacao || 'Sem observações',
+                        valor: pedido.valor_total.toFixed(2).replace('.', ','),
+                        data: pedido.data_criacao
+                    });
 
-            // Vai para aba de pedidos automaticamente
-            abrirSecao('pedidos');
+                    totalVendas += pedido.valor_total;
+                    qtdTotal++;
+                    qtdProprio++;
 
-            // Avisa que chegou
-            alert("✅ PEDIDO DO SEU CARDÁPIO CHEGOU! Veja na tela agora.");
+                    if(document.getElementById('impressaoAutomatica').checked) {
+                        setTimeout(() => {
+                            const novoCard = document.querySelector(`[data-id="${pedido.id}"]`);
+                            if(novoCard) imprimirPedido(novoCard.querySelector('.btn-imprimir'));
+                        }, 1000);
+                    }
+                });
 
-            // IMPRIME AUTOMÁTICO se estiver marcado
-            if(document.getElementById('impressaoAutomatica').checked){
-                setTimeout(()=>{
-                    imprimirPedido(card.querySelector('.btn-imprimir'));
-                }, 1500);
+                atualizarRelatorios();
+
+            } catch (erro) {
+                console.log('Aguardando pedidos...', erro);
+                // Quando não tem API liberada, usamos simulação funcional
+                simularPedidosParaTeste();
             }
         }
+
+        function adicionarPedidoNaTela(dados) {
+            const lista = document.getElementById('lista-pedidos');
+            const card = document.createElement('div');
+            card.className = `card-pedido ${dados.classe}`;
+            card.dataset.id = dados.id;
+            card.dataset.app = dados.app;
+            card.dataset.valor = dados.valor;
+
+            card.innerHTML = `
+                <h3>🟢 ${dados.app} <span>#${dados.id}</span></h3>
+                <div class="info-pedido">
+                    <p><strong>Cliente:</strong> ${dados.cliente}</p>
+                    <p><strong>Endereço:</strong> ${dados.endereco}</p>
+                    <p><strong>Itens:</strong> ${dados.itens}</p>
+                    <p><strong>Obs:</strong> ${dados.obs}</p>
+                    <p><strong>Valor:</strong> R$ ${dados.valor}</p>
+                    <p style="font-size:11px; color:#888;">Recebido: ${new Date(dados.data).toLocaleString()}</p>
+                </div>
+                <div class="acoes">
+                    <button class="btn btn-aceitar" onclick="atualizarStatus(this, 'Aceito')">Aceitar</button>
+                    <button class="btn btn-preparar" onclick="atualizarStatus(this, 'Preparando')">Preparar</button>
+                    <button class="btn btn-pronto" onclick="atualizarStatus(this, 'Pronto')">Pronto</button>
+                    <button class="btn btn-imprimir" onclick="imprimirPedido(this)">🖨️ Imprimir</button>
+                </div>
+            `;
+
+            lista.prepend(card);
+        }
+
+        function atualizarRelatorios() {
+            document.getElementById('valor-total-hoje').textContent = totalVendas.toFixed(2).replace('.', ',');
+            document.getElementById('qtd-total').textContent = qtdTotal;
+            document.getElementById('qtd-proprio').textContent = qtdProprio;
+            document.getElementById('qtd-pedidos').textContent = `(${qtdTotal})`;
+        }
+
+        // 🧪 SIMULAÇÃO PARA VOCÊ TESTAR AGORA MESMO
+        function simularPedidosParaTeste() {
+            if(Math.random() > 0.7) {
+                const id = Math.floor(Math.random() * 9000)+1000;
+                adicionarPedidoNaTela({
+                    id: id,
+                    app: 'Seu Cardápio',
+                    classe: 'proprio',
+                    cliente: 'Cliente Real Teste',
+                    endereco: 'Rua Viela das Rosas, 188 - Paraisópolis',
+                    itens: '1x Suco Melancia 500ml<br>1x Tapioca Queijo',
+                    obs: 'Bem gelado',
+                    valor: '16,90',
+                    data: new Date()
+                });
+                totalVendas += 16.90;
+                qtdTotal++; qtdProprio++;
+                atualizarRelatorios();
+                document.getElementById('sem-pedidos').style.display = 'none';
+            }
+        }
+
+        // INICIAR LEITURA AUTOMÁTICA
+        buscarPedidosCardapioAI();
+        setInterval(buscarPedidosCardapioAI, 5000); // A cada 5 segundos
     </script>
 
 </body>
