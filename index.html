@@ -24,6 +24,7 @@
             align-items: center;
             justify-content: space-between;
             color: #fff;
+            flex-wrap: wrap;
         }
 
         .logo {
@@ -71,12 +72,23 @@
             margin-bottom: 15px;
             border-bottom: 2px solid #9333EA;
             padding-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .config-impressao {
+            font-size: 14px;
+            font-weight: normal;
+            display: flex;
+            gap: 10px;
+            align-items: center;
         }
 
         /* Estilo dos Pedidos */
         .pedidos-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 15px;
         }
 
@@ -86,6 +98,7 @@
             padding: 15px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             border-left: 5px solid;
+            position: relative;
         }
 
         .ifood { border-color: #EA1D2C; }
@@ -98,10 +111,16 @@
             justify-content: space-between;
         }
 
+        .info-pedido {
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
         .acoes {
             margin-top: 10px;
             display: flex;
             gap: 8px;
+            flex-wrap: wrap;
         }
 
         .btn {
@@ -112,11 +131,13 @@
             font-weight: bold;
             cursor: pointer;
             color: #fff;
+            font-size: 13px;
         }
 
         .btn-aceitar { background-color: #22c55e; }
         .btn-preparar { background-color: #f59e0b; }
         .btn-pronto { background-color: #3b82f6; }
+        .btn-imprimir { background-color: #6B21A8; }
 
         /* Estilo Cardápio */
         .cardapio-container {
@@ -170,6 +191,45 @@
             margin-top: 20px;
             font-size: 13px;
         }
+
+        /* ÁREA DE IMPRESSÃO - APARECE SÓ NA HORA DE IMPRIMIR */
+        .cupom-impressao {
+            display: none;
+            width: 80mm;
+            padding: 10px;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+        .cupom-impressao .cabecalho {
+            text-align: center;
+            margin-bottom: 10px;
+            border-bottom: 1px dashed #000;
+            padding-bottom: 5px;
+        }
+        .cupom-impressao .itens {
+            margin: 10px 0;
+        }
+        .cupom-impressao .total {
+            border-top: 1px dashed #000;
+            margin-top: 10px;
+            padding-top: 5px;
+            font-weight: bold;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .cupom-impressao, .cupom-impressao * {
+                visibility: visible;
+            }
+            .cupom-impressao {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -177,7 +237,7 @@
     <header>
         <div>
             <img src="logo.png" alt="Logo A TOCA" class="logo">
-            <h1>Sistema Integrado</h1>
+            <h1>Sistema Integrado - A TOCA</h1>
         </div>
         <div>
             <p>📍 Viela das Rosas, 188 - Paraisópolis</p>
@@ -195,45 +255,63 @@
 
         <!-- SEÇÃO 1: PEDIDOS -->
         <div id="pedidos" class="secao ativa">
-            <h2 class="titulo-secao">📥 Todos os Pedidos (iFood | 99Food | Keeta)</h2>
-            <div class="pedidos-grid">
+            <h2 class="titulo-secao">
+                📥 Todos os Pedidos (iFood | 99Food | Keeta)
+                <div class="config-impressao">
+                    <label><input type="checkbox" id="impressaoAutomatica" checked> Imprimir automático</label>
+                </div>
+            </h2>
+            <div class="pedidos-grid" id="lista-pedidos">
 
                 <!-- EXEMPLO DE PEDIDO IFOOD -->
-                <div class="card-pedido ifood">
+                <div class="card-pedido ifood" data-id="1234" data-app="iFood">
                     <h3>iFood <span>#1234</span></h3>
-                    <p><strong>Cliente:</strong> Maria Silva</p>
-                    <p><strong>Item:</strong> Combo Suco Melancia + Tapioca Ovo</p>
-                    <p><strong>Valor:</strong> R$ 15,99</p>
+                    <div class="info-pedido">
+                        <p><strong>Cliente:</strong> Maria Silva</p>
+                        <p><strong>Endereço:</strong> Rua das Flores, 123</p>
+                        <p><strong>Item:</strong> Combo Suco Melancia + Tapioca Ovo</p>
+                        <p><strong>Obs:</strong> Sem cebola</p>
+                        <p><strong>Valor:</strong> R$ 15,99</p>
+                    </div>
                     <div class="acoes">
                         <button class="btn btn-aceitar" onclick="atualizarStatus(this, 'Aceito')">Aceitar</button>
                         <button class="btn btn-preparar" onclick="atualizarStatus(this, 'Preparando')">Preparar</button>
                         <button class="btn btn-pronto" onclick="atualizarStatus(this, 'Pronto')">Pronto</button>
+                        <button class="btn btn-imprimir" onclick="imprimirPedido(this)">🖨️ Imprimir</button>
                     </div>
                 </div>
 
                 <!-- EXEMPLO DE PEDIDO 99FOOD -->
-                <div class="card-pedido noventaenove">
+                <div class="card-pedido noventaenove" data-id="5678" data-app="99Food">
                     <h3>99Food <span>#5678</span></h3>
-                    <p><strong>Cliente:</strong> João Santos</p>
-                    <p><strong>Item:</strong> Açaí 500ml + Churros Doce de Leite</p>
-                    <p><strong>Valor:</strong> R$ 25,80</p>
+                    <div class="info-pedido">
+                        <p><strong>Cliente:</strong> João Santos</p>
+                        <p><strong>Endereço:</strong> Av. Principal, 456</p>
+                        <p><strong>Item:</strong> Açaí 500ml + Churros Doce de Leite</p>
+                        <p><strong>Valor:</strong> R$ 25,80</p>
+                    </div>
                     <div class="acoes">
                         <button class="btn btn-aceitar" onclick="atualizarStatus(this, 'Aceito')">Aceitar</button>
                         <button class="btn btn-preparar" onclick="atualizarStatus(this, 'Preparando')">Preparar</button>
                         <button class="btn btn-pronto" onclick="atualizarStatus(this, 'Pronto')">Pronto</button>
+                        <button class="btn btn-imprimir" onclick="imprimirPedido(this)">🖨️ Imprimir</button>
                     </div>
                 </div>
 
                 <!-- EXEMPLO DE PEDIDO KEETA -->
-                <div class="card-pedido keeta">
+                <div class="card-pedido keeta" data-id="9012" data-app="Keeta">
                     <h3>Keeta <span>#9012</span></h3>
-                    <p><strong>Cliente:</strong> Ana Carolina</p>
-                    <p><strong>Item:</strong> Caldo Verde + Tapioca Queijo</p>
-                    <p><strong>Valor:</strong> R$ 19,90</p>
+                    <div class="info-pedido">
+                        <p><strong>Cliente:</strong> Ana Carolina</p>
+                        <p><strong>Endereço:</strong> Rua da Viela, 789</p>
+                        <p><strong>Item:</strong> Caldo Verde + Tapioca Queijo</p>
+                        <p><strong>Valor:</strong> R$ 19,90</p>
+                    </div>
                     <div class="acoes">
                         <button class="btn btn-aceitar" onclick="atualizarStatus(this, 'Aceito')">Aceitar</button>
                         <button class="btn btn-preparar" onclick="atualizarStatus(this, 'Preparando')">Preparar</button>
                         <button class="btn btn-pronto" onclick="atualizarStatus(this, 'Pronto')">Pronto</button>
+                        <button class="btn btn-imprimir" onclick="imprimirPedido(this)">🖨️ Imprimir</button>
                     </div>
                 </div>
 
@@ -332,6 +410,18 @@
         <p>© 2026 A TOCA | Sistema de Gerenciamento Integrado</p>
     </footer>
 
+    <!-- DIV OCULTA PARA GERAÇÃO DO CUPOM DE IMPRESSÃO -->
+    <div class="cupom-impressao" id="area-impressao">
+        <div class="cabecalho">
+            <h2>A TOCA</h2>
+            <p>Energia • Sabor • Natural</p>
+            <p>📍 Viela das Rosas, 188 - Paraisópolis</p>
+            <p id="origem-pedido"></p>
+        </div>
+        <div class="itens" id="conteudo-cupom"></div>
+        <div class="total" id="valor-total"></div>
+    </div>
+
     <script>
         // Função para trocar de aba
         function abrirSecao(nomeSecao) {
@@ -344,19 +434,49 @@
         // Função para mostrar status do pedido
         function atualizarStatus(botao, status) {
             const card = botao.closest('.card-pedido');
+            const antigo = card.querySelector('.status-texto');
+            if(antigo) antigo.remove();
+
             const statusEl = document.createElement('p');
+            statusEl.className = 'status-texto';
             statusEl.style.marginTop = '8px';
             statusEl.style.fontWeight = 'bold';
             statusEl.style.color = '#22c55e';
-            statusEl.textContent = `Status: ${status}`;
-            
-            // Remove status antigo se existir
-            const antigo = card.querySelector('p[style*="color:"]');
-            if(antigo) antigo.remove();
+            statusEl.textContent = `✅ Status: ${status}`;
             
             card.appendChild(statusEl);
-            alert(`Pedido ${status} com sucesso! Essa alteração foi enviada para todos os aplicativos.`);
         }
+
+        // FUNÇÃO DE IMPRESSÃO
+        function imprimirPedido(botao) {
+            const card = botao.closest('.card-pedido');
+            const app = card.dataset.app;
+            const numero = card.dataset.id;
+            const conteudo = card.querySelector('.info-pedido').innerHTML;
+            const valor = card.querySelector('p:last-child').textContent;
+
+            // Preenche a área de impressão
+            document.getElementById('origem-pedido').textContent = `PEDIDO #${numero} - ${app.toUpperCase()}`;
+            document.getElementById('conteudo-cupom').innerHTML = conteudo;
+            document.getElementById('valor-total').textContent = valor;
+
+            // Imprime
+            window.print();
+        }
+
+        // SIMULAÇÃO DE PEDIDO NOVO (quando integrar, isso vai vir automático da API)
+        function novoPedidoRecebido(cardElement) {
+            const impressaoAuto = document.getElementById('impressaoAutomatica').checked;
+            if(impressaoAuto) {
+                // Espera 2 segundos para aparecer e imprime
+                setTimeout(() => {
+                    const btnImprimir = cardElement.querySelector('.btn-imprimir');
+                    imprimirPedido(btnImprimir);
+                }, 2000);
+            }
+        }
+
+        // AQUI É ONDE VOCÊ VAI COLOCAR O CÓDIGO DAS CHAVES DA KETA, 99 E IFOOD DEPOIS
     </script>
 
 </body>
